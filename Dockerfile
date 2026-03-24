@@ -42,6 +42,6 @@ COPY --from=publish /app/publish .
 
 # Setup the Python script location
 RUN mkdir -p /app/Scripts
-COPY src/EcgVision.Infrastructure/Scripts/extract_leads.py /app/Scripts/
+COPY src/EcgVision.Web/Scripts/extract_leads.py /app/Scripts/
 
 ENTRYPOINT ["dotnet", "EcgVision.Web.dll"]
