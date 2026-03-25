@@ -18,8 +18,7 @@
 
 ### 2. Configuration
 
-Create a `.env` file in the root directory (refer to `.env_example` for required keys):
-Run the following command to start the API and Database:
+Create a `.env` file in the root directory (refer to `.env_example` for required keys) and run the following command to start the API and Database:
 
 ```
 docker-compose up -d --build
