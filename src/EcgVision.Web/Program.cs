@@ -49,7 +49,7 @@ try
         {
             var context = services.GetRequiredService<ApplicationDbContext>();
             await context.Database.MigrateAsync();
-            await SeedData.SeedRolesAsync(services);
+            await SeedData.SeedAllAsync(services);
         }
         catch (Exception ex)
         {

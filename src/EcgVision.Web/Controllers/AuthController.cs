@@ -1,6 +1,7 @@
 using EcgVision.Core.Dtos;
 using EcgVision.Core.Interfaces.Services;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EcgVision.Web.Controllers;
@@ -9,7 +10,7 @@ namespace EcgVision.Web.Controllers;
 [Route("api/[controller]")]
 public class AuthController(IIdentityService identityService) : ControllerBase
 {
-    //[Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrator")]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest model)
     {

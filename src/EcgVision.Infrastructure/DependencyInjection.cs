@@ -97,6 +97,11 @@ public static class DependencyInjection
                 }, "The specified Python executable or Script folder does not exist on the host system.")
                 .ValidateOnStart();
 
+        services.AddOptions<SeedDataOptions>()
+                .Bind(configuration.GetSection(SeedDataOptions.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
         services.AddOptions<S3Options>()
                 .Bind(configuration.GetSection(S3Options.SectionName))
                 .ValidateDataAnnotations()

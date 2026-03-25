@@ -28,5 +28,7 @@ services:
       - Storage__S3__ServiceUrl=S3_SERVICE_URL
       - Storage__S3__BucketName=S3_BUCKET_NAME
       - Storage__S3__Region=S3_REGION
+      - SeedData__AdminPassword=ADMIN_PASSWORD
+      - SeedData__AdminEmail=ADMIN_EMAIL
     depends_on:
       - ecg-db # Ensures the DB container starts before the Web App
