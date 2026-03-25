@@ -1,0 +1,60 @@
+name: ECG-Vision CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Setup Environment
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # 2. Run XUnit Tests
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Run Tests
+        run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx"
+        env:
+          # These must match the names your code uses (e.g., in appsettings.json or via Environment.GetEnvironmentVariable)
+          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONN_STRING }}
+          PythonOptions__PythonExe: ${{ secrets.PYTHON_EXE_PATH }}
+          PythonOptions__ScriptFolder: ${{ secrets.SCRIPTS_DIR }}
+          Jwt__Key: ${{ secrets.JWT_SECRET_KEY }}
+          Storage__S3__AccessKey: ${{ secrets.S3_ACCESS_KEY }}
+          Storage__S3__SecretKey: ${{ secrets.S3_SECRET_KEY }}
+          Storage__S3__ServiceUrl: ${{ secrets.S3_SERVICE_URL }}
+          Storage__S3__BucketName: ${{ secrets.S3_BUCKET_NAME }}
+          Storage__S3__Region: ${{ secrets.S3_REGION }}
+      
+      # 3. Docker Prep
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 4. Build and Push
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./src/EcgVision.Web/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/ecg-vision:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
