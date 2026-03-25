@@ -26,6 +26,15 @@ docker-compose up -d --build
 ```
 The API will be available at http://localhost:5000.
 
+To watch the logs as they happen:
+```
+docker logs -f ecg-vision-web
+```
+To see the last 100 lines of history and then continue following the live stream:
+```
+docker logs --tail 100 -f ecg-vision-web
+```
+
 ## 📖 API Documentation
 
 Once the application is running in Development mode, you can access the interactive API reference:
