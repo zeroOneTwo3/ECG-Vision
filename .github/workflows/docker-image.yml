@@ -36,6 +36,8 @@ jobs:
           Storage__S3__ServiceUrl: ${{ secrets.S3_SERVICE_URL }}
           Storage__S3__BucketName: ${{ secrets.S3_BUCKET_NAME }}
           Storage__S3__Region: ${{ secrets.S3_REGION }}
+          SeedData__AdminPassword: ${{ ADMIN_PASSWORD }}
+          SeedData__AdminEmail: ${{ ADMIN_EMAIL }}
       
       # 3. Docker Prep
       - name: Set up Docker Buildx
