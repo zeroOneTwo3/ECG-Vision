@@ -1,15 +1,35 @@
 services:
+  # The Reverse Proxy (Caddy)
+  # Caddy is built with a feature called Automatic HTTPS
+  reverse-proxy:
+    image: caddy:2-alpine
+    container_name: ecg-vision-proxy
+    restart: unless-stopped
+    ports:
+      # - "80:80"   # HTTP
+      - "443:443" # HTTPS
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data      # This is where the certificates go!
+      - caddy_config:/config
+    depends_on:
+      - web-app
+    networks:
+      - ecg-network
+
   # The Database Service
   ecg-db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: ecg-vision-sql
+    networks:
+      - ecg-network
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${DB_PASSWORD} # Pulls from .env
     ports:
       - "1433:1433" # Maps container port to your host machine port
-
-  # Your .NET Web App Service
+  
+  # The .NET Web App Service
   web-app:
     build:
       context: .
@@ -30,5 +50,16 @@ services:
       - Storage__S3__Region=${S3_REGION}
       - SeedData__AdminPassword=${ADMIN_PASSWORD}
       - SeedData__AdminEmail=${ADMIN_EMAIL}
+      - ASPNETCORE_URLS=http://+:8080
     depends_on:
-      - ecg-db # Ensures the DB container starts before the Web App
+      - ecg-db
+    networks:
+      - ecg-network
+
+networks:
+  ecg-network:
+    driver: bridge
+
+volumes:
+  caddy_data:    # This makes the storage "permanent"
+  caddy_config:

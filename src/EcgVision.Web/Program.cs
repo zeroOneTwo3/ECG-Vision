@@ -4,6 +4,7 @@ using EcgVision.Web;
 using EcgVision.Web.BackgroundWorkers;
 using EcgVision.Web.Middleware;
 
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 using Scalar.AspNetCore;
@@ -37,6 +38,15 @@ try
     builder.Services.AddOpenApi();
 
     var app = builder.Build();
+
+    // 1. Configure the middleware to process the headers Caddy sends
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        // If it says "https", your Bearer tokens and Cookies will be marked as "Secure"
+        // If it says "http", the middleware isn't trusting Caddy yet,
+        // and you need to check your KnownProxies or forwarded-allow-ips settings.
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
 
     // 2. LOG ENRICHMENT FIRST
     app.UseMiddleware<LogEnrichmentMiddleware>();
